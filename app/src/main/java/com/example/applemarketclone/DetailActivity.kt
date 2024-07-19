@@ -1,48 +1,59 @@
 package com.example.applemarketclone
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.res.ResourcesCompat
 import com.example.applemarketclone.databinding.ActivityDetailBinding
+import java.text.DecimalFormat
 
-@Parcelize
-data class MyItem(val image: Int, var title: String, val address: String, val price: String, val seller: String, val postDetail: String, val replies: Int, val likes: Int) : Parcelable
-
-annotation class Parcelize
 
 class DetailActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityDetailBinding
+
+    private val item: MyItem? by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(Const.ITEM_OBJECT, MyItem::class.java)
+        } else {
+            intent.getParcelableExtra<MyItem>(Const.ITEM_OBJECT)
+        }
+    }
+
+    private val itemPosition: Int by lazy {
+        intent.getIntExtra(Const.ITEM_INDEX, 0)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_detail)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.ivImage.setImageDrawable(item?.let {
+            ResourcesCompat.getDrawable(resources, it.image, null)
+        })
 
-        val item = intent.getParcelableExtra<MyItem>("item")
-        item?.let {
-            binding.ivImage.setImageResource(it.image)
-            binding.tvTitle.text = it.title
-            binding.tvAddress.text = it.address
-            binding.tvPrice.text = it.price
-            binding.tvSeller.text = it.seller
-            binding.tvPostDetail.text = it.postDetail
-        }
+        binding.tvSeller.text = item?.seller
+        binding.tvAddress.text = item?.address
+        binding.tvTitle.text = item?.title
+        binding.tvPostDetail.text = item?.postDetail
+        binding.tvPrice.text = DecimalFormat("#,###").format(item?.price) + "원"
 
         binding.ivBack.setOnClickListener {
-            finish()
+            exit()
         }
+    }
+
+    private fun exit() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("itemIndex", itemPosition)
+        }
+        setResult(RESULT_OK, intent)
+        if (!isFinishing) finish()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        exit()
     }
 }

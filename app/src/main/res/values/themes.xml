@@ -5,5 +5,8 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.AppleMarketClone" parent="Base.Theme.AppleMarketClone" />
+    <style name="Theme.AppleMarketClone" parent="Base.Theme.AppleMarketClone" >
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>
