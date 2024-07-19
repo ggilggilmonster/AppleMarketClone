@@ -8,8 +8,7 @@ import com.example.applemarketclone.databinding.ItemRecyclerviewBinding
 
 class MyAdapter(
     private val mItems: List<MyItem>,
-    private val itemClickListener: (MyItem, Int) -> Unit
-) : RecyclerView.Adapter<MyAdapter.Holder>() {
+    private val onItemClicked: (MyItem, Int) -> Unit) : RecyclerView.Adapter<MyAdapter.Holder>() {
 
     companion object {
         private const val TAG = "MyAdapter"
@@ -18,14 +17,19 @@ class MyAdapter(
     inner class Holder(private val binding: ItemRecyclerviewBinding):RecyclerView.ViewHolder(binding.root) {
         fun bind(item:MyItem){
             Log.d(TAG, "Holder bind() $item")
-            binding.iconItem.setImageResource(item.image)
-            binding.tvTitle.text = item.title
-            binding.tvAddress.text = item.address
-            binding.tvPrice.text = item.price
+            binding.apply {
+            ivImage.setImageResource(item.image)
+            tvTitle.text = item.title
+            tvAddress.text = item.address
+            tvPrice.text = item.price
+            tvRepliesNum.text = item.replies.toString()
+            tvLikesNum.text = item.likes.toString()
+            tvSeller.text = item.seller
+            tvPostDetail.text = item.postDetail
 
-            binding.itemViewLayout.setOnClickListener {
-                Log.d(TAG, "itemViewLayout clicked position: ${item.title}")
-                itemClickListener(item, adapterPosition)
+                root.setOnClickListener {
+                    onItemClicked(item, adapterPosition)
+                }
             }
 
 //            binding.itemViewLayout.setOnClickListener {
